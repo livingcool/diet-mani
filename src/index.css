@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Custom dark mode background styles */
+html {
+  background-color: #FFFDF7;
+  color-scheme: light;
+}
+html.dark {
+  background-color: #0F172A;
+  color-scheme: dark;
+}
+body {
+  background-color: #FFFDF7;
+}
+.dark body {
+  background-color: #0F172A;
+}
+

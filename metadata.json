@@ -1,0 +1,6 @@
+{
+  "name": "Diet Mani",
+  "description": "A premium, mobile-first nutrition operating system based on the RootedAI Follicle Protocol. Features Neobrutalism 2.0 design, interactive daily meal logs, hydration command center, gamified streaks, and hair health tracking.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

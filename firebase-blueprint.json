@@ -1,0 +1,81 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing meta progress, gamification state, badges, and onboarding inputs",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "xp": { "type": "integer" },
+        "challenges": { "type": "array" },
+        "badges": { "type": "array" },
+        "onboarding": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "xp", "challenges", "badges"]
+    },
+    "DailyLog": {
+      "title": "DailyLog",
+      "description": "Dynamic daily meal tracking, actual water consumption, and sleep duration logs",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "meals": { "type": "object" },
+        "waterIntake": { "type": "integer" },
+        "sleepDuration": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "meals", "waterIntake", "sleepDuration"]
+    },
+    "HairPhoto": {
+      "title": "HairPhoto",
+      "description": "Hair photo timeline upload showing high-contrast progress metrics and visual attachments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "metrics": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "date", "photoUrl", "metrics"]
+    },
+    "GeminiLog": {
+      "title": "GeminiLog",
+      "description": "Log entry tracking Gemini AI tokens and estimated costs for each process",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "process": { "type": "string" },
+        "model": { "type": "string" },
+        "promptTokens": { "type": "integer" },
+        "candidatesTokens": { "type": "integer" },
+        "totalTokens": { "type": "integer" },
+        "estimatedCost": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "prompt": { "type": "string" },
+        "response": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["process", "model", "promptTokens", "candidatesTokens", "totalTokens", "estimatedCost", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Primary user configuration and progress profiles"
+    },
+    "/users/{userId}/dailyLogs/{date}": {
+      "schema": "DailyLog",
+      "description": "Synchronized subcollection containing individual daily logs for meal adherence"
+    },
+    "/users/{userId}/hairPhotos/{photoId}": {
+      "schema": "HairPhoto",
+      "description": "Subcollection store of hair photo progress snapshots and automated dandruff, fall scoring metrics"
+    },
+    "/geminiLogs/{logId}": {
+      "schema": "GeminiLog",
+      "description": "Application logs tracking AI model token counts and cost"
+    }
+  }
+}

@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net - secure by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core primitive validation helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      // Mandate email verification for all writes
+      return request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity validations checking strict keys, types, and schema safety bounds
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'xp', 'challenges', 'badges', 'onboarding'])
+        && data.keys().size() <= 6
+        && data.uid == userId
+        && data.uid == request.auth.uid
+        && data.xp is int
+        && data.xp >= 0
+        && data.challenges is list
+        && data.challenges.size() <= 50
+        && data.badges is list
+        && data.badges.size() <= 20;
+    }
+
+    function isValidDailyLog(data, dateStr) {
+      return data.keys().hasAll(['date', 'meals', 'waterIntake', 'sleepDuration'])
+        && data.keys().size() <= 5
+        && data.date == dateStr
+        && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.waterIntake is int
+        && data.waterIntake >= 0
+        && data.waterIntake <= 20000
+        && data.sleepDuration is number
+        && data.sleepDuration >= 0.0
+        && data.sleepDuration <= 24.0;
+    }
+
+    function isValidHairPhoto(data, photoId) {
+      return data.keys().hasAll(['id', 'date', 'photoUrl', 'metrics'])
+        && data.keys().size() <= 5
+        && data.id == photoId
+        && data.id.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.photoUrl is string
+        && data.photoUrl.size() <= 2100000 // plenty of size for 1080p base64 encoded photo blobs
+        && data.metrics is map;
+    }
+
+    function isValidGeminiLog(data) {
+      return data.keys().hasAll(['process', 'model', 'promptTokens', 'candidatesTokens', 'totalTokens', 'estimatedCost', 'timestamp'])
+        && data.keys().size() <= 11
+        && data.process is string
+        && data.process.size() <= 128
+        && data.model is string
+        && data.model.size() <= 64
+        && data.promptTokens is int
+        && data.candidatesTokens is int
+        && data.totalTokens is int;
+    }
+
+    // Strict collection match boundaries
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isEmailVerified() && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isEmailVerified() && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid; // uid immutable
+      allow delete: if false;
+
+      match /dailyLogs/{date} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isEmailVerified() && isValidDailyLog(incoming(), date);
+        allow update: if isOwner(userId) && isEmailVerified() && isValidDailyLog(incoming(), date)
+          && incoming().date == existing().date; // date immutable after creation
+        allow delete: if isOwner(userId);
+      }
+
+      match /hairPhotos/{photoId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isEmailVerified() && isValidHairPhoto(incoming(), photoId);
+        allow update: if isOwner(userId) && isEmailVerified() && isValidHairPhoto(incoming(), photoId)
+          && incoming().id == existing().id // id immutable
+          && incoming().date == existing().date; // date immutable
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /geminiLogs/{logId} {
+      allow read, list: if true;
+      allow create: if isValidGeminiLog(incoming());
+      allow update, delete: if false;
+    }
+  }
+}
