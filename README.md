@@ -1,4 +1,13 @@
 
+---
+title: Diet Mani
+emoji: 🥗
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # Run and deploy 
 
 This contains everything you need to run your app locally.
