@@ -16,7 +16,8 @@ import firebaseConfig from './firebase-applet-config.json';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
 
 // Initialize Firebase App for server-side cost and token metric logging
 const firebaseApp = initializeFirebaseApp(firebaseConfig);
