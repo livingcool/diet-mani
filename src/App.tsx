@@ -31,6 +31,7 @@ interface NotificationItem {
 function AppContent() {
   const {
     isOnboarded,
+    onboarding,
     setOnboarded,
     currentDateStr,
     setCurrentDate,
@@ -189,7 +190,7 @@ function AppContent() {
 
   // 1. Splash check
   if (!hasStartedSplash) {
-    return <SplashScreen onBegin={() => setHasStartedSplash(true)} />;
+    return <SplashScreen onBegin={() => setHasStartedSplash(true)} onboarding={onboarding} />;
   }
 
   // 2. Onboarding check

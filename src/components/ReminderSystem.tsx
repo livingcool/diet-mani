@@ -221,7 +221,7 @@ export const ReminderSystem: React.FC = () => {
       }
     }
 
-    const userName = onboarding?.gender ? 'Warrior' : 'Ganesh';
+    const userName = onboarding?.name || 'Ganesh';
 
     const text = `Good Morning ${userName}.\n\n` +
       `System Telemetry Analysis (Yesterday):\n` +
@@ -384,7 +384,7 @@ export const ReminderSystem: React.FC = () => {
       case 'emailQueue':
         return {
           queueId: "string (Auto uuid)",
-          toEmail: "ganeshkhovalan2203@gmail.com",
+          toEmail: onboarding?.email || "ganeshkhovalan2203@gmail.com",
           subject: "Your Diet Mani Daily Recovery Report",
           templateName: "daily_summary_report",
           variables: { streak: streakCount, compliance: 82, protein: '86%' },
@@ -891,14 +891,14 @@ export const ReminderSystem: React.FC = () => {
               <div className="border-2 border-[#1E293B] dark:border-[#475569] bg-white dark:bg-[#1E293B] p-4.5 rounded-xl text-black dark:text-zinc-100 font-mono text-xs max-h-[300px] overflow-y-auto">
                 <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-3 space-y-1 text-[11px] font-semibold text-zinc-500">
                   <div><span className="text-zinc-450 uppercase">Sender:</span> Diet Mani System Notification &lt;recovery@dietmani.applet&gt;</div>
-                  <div><span className="text-zinc-450 uppercase">Recipient:</span> Ganesh &lt;ganeshkhovalan2203@gmail.com&gt;</div>
+                  <div><span className="text-zinc-450 uppercase">Recipient:</span> {onboarding?.name || 'Ganesh'} &lt;{onboarding?.email || 'ganeshkhovalan2203@gmail.com'}&gt;</div>
                   <div><span className="text-zinc-450 uppercase">Subject:</span> <span className="text-[#0057FF] dark:text-[#4D8DFF] font-black">[DAILY REPORT] Your Diet Mani Daily Recovery Report</span></div>
                 </div>
 
                 <div className="space-y-3 font-sans normal-case text-zinc-700 dark:text-zinc-350">
                   <h4 className="font-extrabold text-sm text-black dark:text-white uppercase tracking-wider font-mono">🍉 Your Diet Mani Daily Recovery Report ({currentDateStr})</h4>
                   <p className="text-xs leading-relaxed">
-                    Hello Ganesh! Your biological performance logs have been reviewed by our AI Coaching analytics system. Below are your localized compliance profiles for today:
+                    Hello {onboarding?.name || 'Ganesh'}! Your biological performance logs have been reviewed by our AI Coaching analytics system. Below are your localized compliance profiles for today:
                   </p>
                   
                   {/* Stats table */}

@@ -6,20 +6,22 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Leaf, ShieldAlert, HeartPulse } from 'lucide-react';
+import { OnboardingData } from '../types';
 import { RootedLogo } from './RootedLogo';
 
 interface SplashScreenProps {
   onBegin: () => void;
+  onboarding?: OnboardingData | null;
 }
 
-export const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin }) => {
+export const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin, onboarding }) => {
   return (
     <div id="splash-container" className="relative min-h-screen bg-[#FFFDF7] dark:bg-[#0F172A] flex flex-col justify-between p-6 overflow-hidden select-none font-sans transition-colors duration-200">
       {/* Visual Canvas Grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#475569_1px,transparent_1px)] opacity-15 pointer-events-none" />
 
       {/* Central Visual Logo Reveal */}
-      <div className="flex-grow flex flex-col items-center justify-center text-center z-10 max-w-md mx-auto my-auto py-12">
+      <div className="flex-grow flex flex-col items-center justify-center text-center z-10 max-w-md mx-auto my-auto py-12 w-full">
         <RootedLogo size={140} showWordmark={true} className="mb-8" />
 
         <motion.p
@@ -31,12 +33,34 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin }) => {
           &ldquo;Your follicles are built in the kitchen.&rdquo;
         </motion.p>
 
+        {/* Dynamic Personal Details Active Profile Card */}
+        {onboarding && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 }}
+            className="bg-[#E2F0FF] dark:bg-[#1E2E4A] border-4 border-[#1E293B] dark:border-[#475569] p-4 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B] dark:shadow-[4px_4px_0px_0px_#0A0F1C] text-left mb-6 flex gap-3 text-[#16213E] dark:text-[#F8FAFC] w-full"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#0057FF] dark:bg-[#4D8DFF] border-2 border-[#1E293B] dark:border-[#475569] flex items-center justify-center shrink-0">
+              <span className="text-xl">👤</span>
+            </div>
+            <div className="space-y-0.5">
+              <h4 className="font-extrabold text-[10px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Follicle Agent Active</h4>
+              <p className="text-base font-black text-[#0057FF] dark:text-[#4D8DFF] leading-tight uppercase mt-0.5">{onboarding.name}</p>
+              <div className="flex flex-col text-[10px] text-zinc-650 dark:text-zinc-400 font-mono mt-1.5 leading-tight font-bold uppercase">
+                <span>📧 {onboarding.email}</span>
+                {onboarding.phone && <span className="mt-0.5">📞 {onboarding.phone}</span>}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Nutritional Subtext Badge */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.8 }}
-          className="bg-[#E0DCFF] dark:bg-[#202E5C] border-4 border-[#1E293B] dark:border-[#475569] p-4 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B] dark:shadow-[4px_4px_0px_0px_#0A0F1C] text-left mb-6 flex gap-3 text-[#16213E] dark:text-[#F8FAFC]"
+          className="bg-[#E0DCFF] dark:bg-[#202E5C] border-4 border-[#1E293B] dark:border-[#475569] p-4 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B] dark:shadow-[4px_4px_0px_0px_#0A0F1C] text-left mb-6 flex gap-3 text-[#16213E] dark:text-[#F8FAFC] w-full"
         >
           <div className="w-10 h-10 rounded-xl bg-[#8B5CF6] dark:bg-[#A78BFA] border-2 border-[#1E293B] dark:border-[#475569] flex items-center justify-center shrink-0">
             <HeartPulse className="w-6 h-6 text-white dark:text-[#0F172A]" />
@@ -57,7 +81,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onBegin }) => {
           onClick={onBegin}
           className="w-full bg-[#0057FF] dark:bg-[#4D8DFF] text-white dark:text-[#0F172A] border-4 border-[#1E293B] dark:border-[#475569] py-4 rounded-[24px] font-black text-xl tracking-wide uppercase cursor-pointer hover:bg-blue-600 dark:hover:bg-blue-400 transition-colors shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#0A0F1C] duration-150"
         >
-          Begin Mission
+          {onboarding ? `Resume Mission: ${onboarding.name.split(' ')[0]}` : 'Begin Mission'}
         </motion.button>
         <span className="text-[11px] font-mono font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1">
           <ShieldAlert className="w-3.5 h-3.5" /> 100% Secure &amp; Locally Encrypted

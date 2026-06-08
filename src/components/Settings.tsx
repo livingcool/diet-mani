@@ -8,7 +8,8 @@ import { useDietStore } from '../store/dietStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Settings as LucideSettings, Sun, Moon, Database, 
-  Bell, HelpCircle, RefreshCw, Send, CheckCircle, Info, Sparkles, Cpu
+  Bell, HelpCircle, RefreshCw, Send, CheckCircle, Info, Sparkles, Cpu,
+  User, Mail, Phone, Edit3, Save, X
 } from 'lucide-react';
 import { ReminderSystem } from './ReminderSystem';
 
@@ -17,6 +18,7 @@ export const Settings: React.FC = () => {
     isDarkMode,
     toggleTheme,
     resetOnboarding,
+    setOnboarded,
     dailyLogs,
     hairPhotos,
     badges,
@@ -25,6 +27,30 @@ export const Settings: React.FC = () => {
 
   const [testNotification, setTestNotification] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Profile edit state
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editName, setEditName] = useState(onboarding?.name || '');
+  const [editEmail, setEditEmail] = useState(onboarding?.email || '');
+  const [editPhone, setEditPhone] = useState(onboarding?.phone || '');
+
+  const handleSaveProfile = () => {
+    if (!editName.trim()) { alert('Name is required.'); return; }
+    if (!editEmail.trim() || !editEmail.includes('@')) { alert('Please enter a valid email.'); return; }
+    if (onboarding) {
+      setOnboarded({ ...onboarding, name: editName.trim(), email: editEmail.trim(), phone: editPhone.trim() || undefined });
+    }
+    setEditingProfile(false);
+    setSuccessMsg('Profile updated successfully!');
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const handleStartEditProfile = () => {
+    setEditName(onboarding?.name || '');
+    setEditEmail(onboarding?.email || '');
+    setEditPhone(onboarding?.phone || '');
+    setEditingProfile(true);
+  };
   
   // Tab selector inside Setup: general vs alerts
   const [subTab, setSubTab] = useState<'reminders' | 'general'>('reminders');
@@ -155,6 +181,100 @@ export const Settings: React.FC = () => {
         <ReminderSystem />
       ) : (
         <div className="space-y-6">
+          {/* Personal Profile Details Card */}
+          {onboarding && (
+            <div className="bg-white dark:bg-[#1E293B] border-4 border-[#1E293B] dark:border-[#475569] p-5 rounded-[24px] shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#0A0F1C]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#0057FF] dark:text-[#4D8DFF]" />
+                  <h3 className="text-sm font-black uppercase tracking-wider text-[#16213E] dark:text-[#F8FAFC]">Agent Profile</h3>
+                </div>
+                {!editingProfile ? (
+                  <button
+                    onClick={handleStartEditProfile}
+                    className="flex items-center gap-1 text-[10px] font-black uppercase bg-[#E0DCFF] dark:bg-[#202E5C] border-2 border-[#1E293B] dark:border-[#475569] px-2.5 py-1 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#1E293B] hover:bg-[#d0c9ff] transition-all"
+                  >
+                    <Edit3 className="w-3 h-3" /> Edit
+                  </button>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={handleSaveProfile}
+                      className="flex items-center gap-1 text-[10px] font-black uppercase bg-[#0057FF] text-white border-2 border-[#1E293B] dark:border-[#475569] px-2.5 py-1 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#1E293B] hover:bg-blue-600 transition-all"
+                    >
+                      <Save className="w-3 h-3" /> Save
+                    </button>
+                    <button
+                      onClick={() => setEditingProfile(false)}
+                      className="p-1 border-2 border-[#1E293B] dark:border-[#475569] rounded-lg text-gray-500 hover:text-black dark:hover:text-white cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {editingProfile ? (
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1"><User className="w-3 h-3" /> Full Name</label>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="bg-white dark:bg-[#273449] border-3 border-[#1E293B] dark:border-[#475569] px-4 py-2.5 rounded-[16px] text-sm font-bold text-[#16213E] dark:text-[#F8FAFC] focus:outline-none shadow-[2px_2px_0px_0px_#1E293B]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1"><Mail className="w-3 h-3" /> Email</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="bg-white dark:bg-[#273449] border-3 border-[#1E293B] dark:border-[#475569] px-4 py-2.5 rounded-[16px] text-sm font-bold text-[#16213E] dark:text-[#F8FAFC] focus:outline-none shadow-[2px_2px_0px_0px_#1E293B]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1"><Phone className="w-3 h-3" /> Phone (Optional)</label>
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="bg-white dark:bg-[#273449] border-3 border-[#1E293B] dark:border-[#475569] px-4 py-2.5 rounded-[16px] text-sm font-bold text-[#16213E] dark:text-[#F8FAFC] focus:outline-none shadow-[2px_2px_0px_0px_#1E293B]"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5 bg-[#FFFDF7] dark:bg-[#273449] border-2 border-[#1E293B]/20 dark:border-[#475569]/40 p-3 rounded-xl">
+                    <User className="w-4 h-4 text-[#0057FF] dark:text-[#4D8DFF] shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-mono font-black text-gray-400 uppercase block">Full Name</span>
+                      <span className="text-sm font-black text-[#16213E] dark:text-[#F8FAFC] uppercase">{onboarding.name}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 bg-[#FFFDF7] dark:bg-[#273449] border-2 border-[#1E293B]/20 dark:border-[#475569]/40 p-3 rounded-xl">
+                    <Mail className="w-4 h-4 text-[#00C2B8] shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-mono font-black text-gray-400 uppercase block">Email</span>
+                      <span className="text-sm font-bold text-[#16213E] dark:text-[#F8FAFC]">{onboarding.email}</span>
+                    </div>
+                  </div>
+                  {onboarding.phone && (
+                    <div className="flex items-center gap-2.5 bg-[#FFFDF7] dark:bg-[#273449] border-2 border-[#1E293B]/20 dark:border-[#475569]/40 p-3 rounded-xl">
+                      <Phone className="w-4 h-4 text-[#FFB703] shrink-0" />
+                      <div>
+                        <span className="text-[9px] font-mono font-black text-gray-400 uppercase block">Phone</span>
+                        <span className="text-sm font-bold text-[#16213E] dark:text-[#F8FAFC]">{onboarding.phone}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Theme Toggler Settings Block */}
           <div className="bg-white dark:bg-[#1E293B] border-4 border-[#1E293B] dark:border-[#475569] p-5 rounded-[24px] shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#0A0F1C]">
             <h3 className="font-black text-sm uppercase text-gray-400 mb-4 tracking-wider">Visual Interface Mode</h3>

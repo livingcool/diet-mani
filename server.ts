@@ -4,6 +4,7 @@
  */
 
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
@@ -17,6 +18,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
+// Enable CORS for all origins (required for mobile app + browser clients)
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors());
 
 
 // Initialize Firebase App for server-side cost and token metric logging
@@ -152,7 +161,7 @@ app.post('/api/gemini/recovery-coach', async (req, res) => {
   const lifestyle = onboarding?.lifestyle || "Vegetarian";
   const concerns = onboarding?.selectedConcerns?.join(", ") || "Hair fall";
 
-  const systemInstruction = "You are a professional Trichology and Hair Recovery Coach. Provide a concise, motivating morning routine summary for ganesh based on yesterday's logs. Format response purely in text, with structured headings and dynamic bullet points, keeping it highly human and personalized.";
+  const systemInstruction = `You are a professional Trichology and Hair Recovery Coach. Provide a concise, motivating morning routine summary for ${userName} based on yesterday's logs. Format response purely in text, with structured headings and dynamic bullet points, keeping it highly human and personalized.`;
   
   const prompt = `
     Generate a Morning Hair Recovery Coach Summary for ${userName}.

@@ -51,6 +51,9 @@ export enum ExerciseFrequency {
 }
 
 export interface OnboardingData {
+  name: string;
+  email: string;
+  phone?: string;
   age: number;
   gender: Gender;
   height: number;
@@ -62,6 +65,7 @@ export interface OnboardingData {
   stressLevel: StressLevel;
   exerciseFrequency: ExerciseFrequency;
 }
+
 
 export interface NutrientProfile {
   protein: number;       // grams

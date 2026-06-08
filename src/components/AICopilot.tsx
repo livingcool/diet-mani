@@ -121,7 +121,7 @@ export const AICopilot: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'Ganesh',
+          name: onboarding?.name || 'Ganesh',
           log: currentLog,
           scores: scores,
           onboarding: onboarding

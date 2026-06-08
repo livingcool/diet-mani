@@ -345,7 +345,7 @@ export const Dashboard: React.FC = () => {
             </div>
             
             <h1 className="text-2xl font-black tracking-tight leading-none uppercase text-[#16213E] dark:text-white">
-              {getHourGreeting()}, <span className="text-[#0057FF] dark:text-[#4D8DFF]">Ganesh</span>
+              {getHourGreeting()}, <span className="text-[#0057FF] dark:text-[#4D8DFF]">{onboarding?.name || 'Ganesh'}</span>
             </h1>
             <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               FOLICULAR RANK: <span className="text-amber-500 dark:text-yellow-400 font-mono">{levelInfo.title}</span> (LVL {levelInfo.level})

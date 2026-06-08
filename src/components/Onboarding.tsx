@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Gender, HairConcern, Lifestyle, StressLevel, ExerciseFrequency, OnboardingData 
 } from '../types';
-import { ArrowRight, ArrowLeft, Ruler, Activity, Check, Smile, Droplets, Flame } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Ruler, Activity, Check, Smile, Droplets, Flame, User, Mail, Phone } from 'lucide-react';
 
 interface OnboardingProps {
   onComplete: (data: OnboardingData) => void;
@@ -17,7 +17,12 @@ interface OnboardingProps {
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [step, setStep] = useState(1);
   
-  // States
+  // Personal Details States
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  
+  // Biometric States
   const [age, setAge] = useState<number>(26);
   const [gender, setGender] = useState<Gender>(Gender.MALE);
   const [height, setHeight] = useState<number>(175);
@@ -38,11 +43,25 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   };
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step === 1) {
+      if (!name.trim()) {
+        alert("Please enter your name.");
+        return;
+      }
+      if (!email.trim() || !email.includes('@')) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+    }
+
+    if (step < 4) {
       setStep(step + 1);
     } else {
       // Complete!
       const data: OnboardingData = {
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim() ? phone.trim() : undefined,
         age,
         gender,
         height,
@@ -78,12 +97,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           Follicle Profile Setup
         </h2>
         <span className="font-mono font-extrabold text-sm border-2 border-[#1E293B] bg-[#FFB703] text-[#16213E] px-3 py-1 rounded-xl shadow-[2px_2px_0px_0px_#1E293B]">
-          Step {step}/3
+          Step {step}/4
         </span>
       </div>
 
       {/* Interactive Form Stack */}
-      <div className="flex-1 max-w-lg mx-auto w-full flex flex-col justify-center z-10 My-4 text-[#16213E]">
+      <div className="flex-1 max-w-lg mx-auto w-full flex flex-col justify-center z-10 my-4 text-[#16213E]">
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -94,9 +113,69 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
+              <div className="bg-[#E2F0FF] border-4 border-[#1E293B] p-5 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B]">
+                <span className="flex items-center gap-2 font-black uppercase text-sm mb-1 tracking-wider text-[#0057FF]">
+                  <User className="w-5 h-5" /> 01. PERSONAL IDENTITY
+                </span>
+                <p className="text-xs text-slate-700 font-semibold">Please input your name and contact details to register your custom hair recovery dashboard.</p>
+              </div>
+
+              {/* Name */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-black uppercase tracking-wide flex items-center gap-1.5">
+                  <User className="w-4 h-4" /> Full Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Ganesh K"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-white border-4 border-[#1E293B] px-5 py-3 rounded-[24px] text-lg font-bold text-[#16213E] focus:outline-none shadow-[4px_4px_0px_0px_#1E293B]"
+                />
+              </div>
+
+              {/* Email */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-black uppercase tracking-wide flex items-center gap-1.5">
+                  <Mail className="w-4 h-4" /> Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="e.g. ganesh@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white border-4 border-[#1E293B] px-5 py-3 rounded-[24px] text-lg font-bold text-[#16213E] focus:outline-none shadow-[4px_4px_0px_0px_#1E293B]"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-black uppercase tracking-wide flex items-center gap-1.5">
+                  <Phone className="w-4 h-4" /> Phone Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. +91 98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-white border-4 border-[#1E293B] px-5 py-3 rounded-[24px] text-lg font-bold text-[#16213E] focus:outline-none shadow-[4px_4px_0px_0px_#1E293B]"
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
               <div className="bg-[#FFF1EE] border-4 border-[#1E293B] p-5 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B]">
                 <span className="flex items-center gap-2 font-black uppercase text-sm mb-1 tracking-wider text-[#FF8A65]">
-                  <Flame className="w-5 h-5" /> 01. BIOMETRIC CORE
+                  <Flame className="w-5 h-5" /> 02. BIOMETRIC CORE
                 </span>
                 <p className="text-xs text-slate-700 font-semibold">Your baseline stats calibrate recovery rates and keratin production targets.</p>
               </div>
@@ -158,9 +237,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </motion.div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <motion.div
-              key="step2"
+              key="step3"
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
@@ -169,7 +248,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             >
               <div className="bg-[#E0DCFF] border-4 border-[#1E293B] p-5 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B]">
                 <span className="font-black uppercase text-sm mb-1 tracking-wider text-[#8B5CF6] block">
-                  02. FOLLICLE CONCERNS
+                  03. FOLLICLE CONCERNS
                 </span>
                 <p className="text-xs text-slate-700 font-semibold">Select the symptoms you wish to intercept. These calibrate your macro/micronutrient targeting weights.</p>
               </div>
@@ -208,9 +287,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </motion.div>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <motion.div
-              key="step3"
+              key="step4"
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
@@ -219,7 +298,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             >
               <div className="bg-[#E0FBF9] border-4 border-[#1E293B] p-5 rounded-[24px] shadow-[4px_4px_0px_0px_#1E293B]">
                 <span className="font-black uppercase text-sm mb-1 tracking-wider text-[#00C2B8] block">
-                  03. LIFESTYLE SHIELD
+                  04. LIFESTYLE SHIELD
                 </span>
                 <p className="text-xs text-slate-700 font-semibold">Your metabolics benefit from customized hydration, exercise routines, and stress shielding limits.</p>
               </div>
@@ -333,7 +412,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           onClick={handleNext}
           className="flex-1 flex items-center justify-center gap-3 bg-[#0057FF] text-white border-4 border-[#1E293B] px-6 py-4 rounded-[24px] font-black text-lg uppercase cursor-pointer hover:bg-blue-600 shadow-[4px_4px_0px_0px_#1E293B]"
         >
-          {step === 3 ? 'Generate Personalized Targets' : 'Continue'}{' '}
+          {step === 4 ? 'Generate Personalized Targets' : 'Continue'}{' '}
           <ArrowRight className="w-5 h-5 shrink-0" />
         </button>
       </div>

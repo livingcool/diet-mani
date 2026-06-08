@@ -22,7 +22,8 @@ export const DietEngine: React.FC = () => {
     skipMeal,
     replaceMeal,
     updateMealNotes,
-    updateMealReview
+    updateMealReview,
+    onboarding
   } = useDietStore();
 
   const activeLog = dailyLogs[currentDateStr];
@@ -141,7 +142,7 @@ export const DietEngine: React.FC = () => {
           </div>
           
           <h2 className="text-2xl font-black uppercase tracking-tight mt-2 leading-none text-[#16213E] dark:text-white">
-            Ganesh&apos;s Diet Fuel Deck
+            {onboarding?.name || 'Ganesh'}&apos;s Diet Fuel Deck
           </h2>
           <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 leading-relaxed mt-1">
             Activate, check compliance, and evaluate each meal-block. Every logged element feeds amino acids directly into your follicle growth timeline.
