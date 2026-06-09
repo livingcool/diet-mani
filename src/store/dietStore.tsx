@@ -490,21 +490,62 @@ export const DietProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetOnboarding = async () => {
+    // ── 1. Wipe every localStorage key the app uses ──
+    const KEYS = [
+      'dietmani_onboarding',
+      'dietmani_logs',
+      'dietmani_photos',
+      'dietmani_badges',
+      'dietmani_xp',
+      'dietmani_challenges',
+    ];
+    KEYS.forEach(k => localStorage.removeItem(k));
+    // Keep dark mode preference — only data reset
+
+    // ── 2. Reset ALL in-memory React state to factory defaults ──
     setOnboarding(null);
     setIsOnboardedState(false);
+    setDailyLogs({});
+    setHairPhotos([]);
+    setBadges(INITIAL_BADGES);
+    setXp(0);
+    setStreakCount(0);
+    setChallenges([
+      { id: 'iron_warrior',       name: 'Iron Warrior',       description: 'Consume Iron target (15mg) 15 Days',    target: 15, current: 0, rewardXp: 500, completed: false, type: 'iron'       },
+      { id: 'hydration_commander',name: 'Hydration Commander', description: 'Meet 3L hydration target 7 Days straight',target: 7, current: 0, rewardXp: 300, completed: false, type: 'hydration'  },
+      { id: 'protein_titan',      name: 'Protein Titan',      description: 'Meet full daily amino acid needs 10 Days', target: 10, current: 0, rewardXp: 400, completed: false, type: 'protein'   },
+      { id: 'perfect_mission',    name: 'Perfect Mission',    description: 'Hit perfect 90%+ compliance day',         target: 1,  current: 0, rewardXp: 250, completed: false, type: 'perfect_day'},
+    ]);
+
+    // ── 3. If signed in: wipe Firestore user doc + all dailyLogs ──
     if (user) {
       try {
+        // Overwrite root user document with blank slate
         await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
           onboarding: null,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
+          xp: 0,
+          challenges: [],
+          badges: [],
+          updatedAt: new Date().toISOString(),
+          resetAt: new Date().toISOString(),
+        });
+
+        // Delete all logs in dailyLogs subcollection via snapshot
+        const { getDocs } = await import('firebase/firestore');
+        const logsSnap = await getDocs(collection(db, 'users', user.uid, 'dailyLogs'));
+        const deletes = logsSnap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletes);
+
+        console.log(`[Factory Reset] Wiped ${logsSnap.size} Firestore log documents.`);
       } catch (e) {
         handleFirestoreError(e, OperationType.WRITE, `users/${user.uid}`);
       }
-    } else {
-      localStorage.removeItem('dietmani_onboarding');
     }
+
+    console.log('[Factory Reset] ✅ All data wiped. App returning to onboarding.');
   };
+
 
   const setCurrentDate = (dateStr: string) => {
     setCurrentDateStr(dateStr);

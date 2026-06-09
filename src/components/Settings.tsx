@@ -27,6 +27,8 @@ export const Settings: React.FC = () => {
 
   const [testNotification, setTestNotification] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Profile edit state
   const [editingProfile, setEditingProfile] = useState(false);
@@ -393,12 +395,39 @@ export const Settings: React.FC = () => {
               </button>
             </div>
 
-            <button
-              onClick={resetOnboarding}
-              className="w-full py-3.5 bg-[#FFF1EE] dark:bg-rose-950/40 border-4 border-[#1E293B] dark:border-[#475569] rounded-[20px] font-black uppercase text-xs tracking-wider text-[#FF8A65] dark:text-[#FB7185] cursor-pointer shadow-[3px_3px_0px_0px_#1E293B] dark:shadow-[3px_3px_0px_0px_#0A0F1C] active:translate-y-0.5"
-            >
-              Reset Biometric Onboarding profile
-            </button>
+            {!resetConfirm ? (
+              <button
+                onClick={() => setResetConfirm(true)}
+                className="w-full py-3.5 bg-[#FFF1EE] dark:bg-rose-950/40 border-4 border-[#1E293B] dark:border-[#475569] rounded-[20px] font-black uppercase text-xs tracking-wider text-[#FF8A65] dark:text-[#FB7185] cursor-pointer shadow-[3px_3px_0px_0px_#1E293B] dark:shadow-[3px_3px_0px_0px_#0A0F1C] active:translate-y-0.5 flex items-center justify-center gap-2"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Factory Reset — Wipe All Data
+              </button>
+            ) : (
+              <div className="border-4 border-red-500 rounded-[20px] p-4 bg-red-50 dark:bg-red-950/40 space-y-3">
+                <p className="text-xs font-black uppercase text-red-600 dark:text-red-400 text-center tracking-wider">⚠️ This will permanently delete ALL your logs, photos, XP, and profile data.</p>
+                <p className="text-[10px] text-red-500 dark:text-red-300 text-center font-mono">Local storage + Firestore database will be wiped. This cannot be undone.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setResetConfirm(false)}
+                    className="py-3 border-3 border-[#1E293B] dark:border-[#475569] rounded-xl text-xs font-black uppercase bg-white dark:bg-[#273449] text-[#16213E] dark:text-white cursor-pointer shadow-[2px_2px_0px_0px_#1E293B]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setIsResetting(true);
+                      await resetOnboarding();
+                      setIsResetting(false);
+                      setResetConfirm(false);
+                    }}
+                    disabled={isResetting}
+                    className="py-3 border-3 border-red-600 rounded-xl text-xs font-black uppercase bg-red-600 text-white cursor-pointer shadow-[2px_2px_0px_0px_#7f1d1d] disabled:opacity-60 flex items-center justify-center gap-1"
+                  >
+                    {isResetting ? <><RefreshCw className="w-3 h-3 animate-spin" /> Wiping...</> : '🗑️ Yes, Wipe Everything'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
